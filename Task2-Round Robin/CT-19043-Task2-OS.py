@@ -27,9 +27,10 @@ def completionTime(NumberOfProcess, arr_time, bur_time, quantamTime):
                 count += temp_arr_three[index]
                 temp_arr_three[index] = 0
             if temp_arr_three[index] == 0:
-                temp_arr_three[index] += count
+                comp_time[index] += count
         if value is True:
             break
+    # print(comp_time)
     return comp_time, temp_arr
 
 
