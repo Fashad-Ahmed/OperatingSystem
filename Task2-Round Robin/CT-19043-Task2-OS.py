@@ -60,9 +60,9 @@ def displayTable(NumberOfProcess, arr_time, bur_time, wait_time, turnaround_time
     print('Process\t\tArrival time\t\tBurst Time\t\tWaiting Time\t\tTurnaround Time')
     for i in range(NumberOfProcess):
         print(
-            str(i + 1) + '\t\t\t\t' + str(arr_time[i]) + '\t\t\t\t'
-            + str(bur_time[i]) + '\t\t\t\t' + str(wait_time[i]) +
-            '\t\t\t\t\t\t' + str(turnaround_time[i])
+            str(i + 1) + '\t\t' + str(arr_time[i]) + '\t\t\t\t'
+            + str(bur_time[i]) + '\t\t' + str(wait_time[i]) +
+            '\t\t\t' + str(turnaround_time[i])
         )
 
 def roundRobin(NumberOfProcess, quantamTime):
@@ -92,5 +92,5 @@ def roundRobin(NumberOfProcess, quantamTime):
 
 if __name__ == "__main__":
     NumberOfProcess = int(input('Enter Number of Process:     '))
-    quantamTime = 2
+    quantamTime = 43
     roundRobin(NumberOfProcess, quantamTime)
