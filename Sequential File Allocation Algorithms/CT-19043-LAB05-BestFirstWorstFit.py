@@ -66,9 +66,17 @@ def sizeBlock(blockSize, processSize):
         for i in range(processSize):
             val = int(input(f"Enter process size for segment {i+1}: "))
             prcSize.append(val)
-
+        print()
+        print('----------------- BEST FIT -----------------')
+        print()
         bestFit(blcSize, prcSize)
+        print()
+        print('----------------- FIRST FIT -----------------')
+        print()
         firstFit(blcSize, prcSize)
+        print()
+        print('----------------- WORST FIT -----------------')
+        print()
         worstFit(blcSize, prcSize)
 
     else:
