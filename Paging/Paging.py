@@ -1,112 +1,115 @@
-from random import seed
-from random import randint
-import sys
 
+def Paging(processSize, memorySize, processPages, memoryPages):
 
-def FIFO(size, pages):
-    page_list = list(pages)  # split string into list
-    mem = []  # list of frames
-    queue = []  # queue to track page reference order
-    i = 0  # frame use counter
-    npfault = 0
+    pages = []
+    for i in range(memoryPages):
+        pages.append(i)
+    print(f"\nPages: {pages}")
 
-    for page in page_list:
-        if i < size:  # if frames not full
-            if page not in mem:  # if page not in memory
-                mem.append(page)
-                queue.append(page)
-                i += 1
-                npfault += 1
+    physicalMemory = []
+    x = 0
+    for i in range(memoryPages):
+        L = []
+        for j in range(2):
+            L.append(x)
+            x += 1
+        physicalMemory.append(L)
+    print(f"Physical Memory: {physicalMemory}")
 
-        else:
-            if page not in mem:
-                q = queue.pop(0)  # pop the first element of the queue (FIFO)
-                queue.append(page)  # add new page to queue
-                j = mem.index(q)  # get the index page to evict
-                mem[j] = page  # replace page
-                npfault += 1
+    process = []
+    x = 0
+    for i in range(processPages):
+        L = []
+        for j in range(2):
+            L.append(x)
+            x += 1
+        process.append(L)
+    print(f"\nProcess has {processPages} pages: {process}")
 
-    return npfault
+    memory = [[1, 1], [1, 1], [0, 0], [1, 1], [0, 0], [0, 0], [0, 0], [0, 0]]
+    print(f"\nMemory before the processes are stored: {memory}")
+    print("Here, 0 represents empty slots, 1 represents filled spots")
 
+    pageTable = []
+    for i in range(len(memory)):
+        count = 0
+        for j in range(2):
+            if memory[i][j] == 1:
+                break
+            else:
+                memory[i][j] = 1
+                count += 1
+        if count == 2:
+            pageTable.append(i)
+        if len(pageTable) == processPages:
+            break
+    print(f"\nPage Table storing frames: {pageTable}")
 
-def LRU(size, pages):
-    page_list = list(pages)  # split string into list
-    mem = []  # list of frames
-    usage = []  # list to track page reference order
-    i = 0
-    npfault = 0
+    byte = int(input("\nWHICH BYTE DO YOU WANT TO ACCESS? "))
 
-    for page in page_list:
-        if i < size:
-            if page in usage:  # if page has been used, add it to front of list
-                usage.remove(page)
-            usage.insert(0, page)
-            if page not in mem:  # if page not in memory, add it
-                mem.append(page)
-                i += 1
-                npfault += 1
+    def DecimalToBinary(num):
+        binaryByte = []
+        if num >= 1:
+            DecimalToBinary(num // 2)
+            binaryByte.append(num % 2)
+            DecimalToBinary(byte)
 
-        else:
-            if page in usage:  # if page has been used, add it to front of list
-                usage.remove(page)
-            usage.insert(0, page)
-            if page not in mem:  # if page not in memory
-                # remove last element of the list (least used page)
-                q = usage.pop(-1)
-                j = mem.index(q)  # get the index page to evict
-                mem[j] = page
-                npfault += 1
+        for i in binaryByte:
+            if binaryByte[0] == 0:
+                binaryByte.pop(0)
 
-    return npfault
+        logicalAddress = ""
+        for i in binaryByte:
+            logicalAddress += str(i)
+            physicalAddress = int(logicalAddress)
+            print(f"\nLogical Address: {logicalAddress}")
 
+        offset = binaryByte[len(binaryByte) - 1]
+        binaryByte.pop()
+        pageNo = ""
+        for i in binaryByte:
+            pageNo += str(i)
+            binaryPageNo = pageNo
+            pageNo = int(pageNo, 2)
+            print(
+                f"Where, page number is {binaryPageNo} and offset is {offset}.")
 
-def OPT(size, pages):
-    page_list = list(pages)
-    mem = []  # list of frames
-    i = 0  # frame use counter
-    n = 0  # page reference index counter
-    npfault = 0
+        frameNo = pageTable[int(pageNo)]
+        binaryByte = []
+        DecimalToBinary(frameNo)
 
-    for page in page_list:
-        if i < size:
-            if page not in mem:
-                mem.append(page)
-                i += 1
-                npfault += 1
-            n += 1
+        for i in binaryByte:
+            if binaryByte[0] == 0:
+                binaryByte.pop(0)
 
-        else:
-            if page not in mem:
-                # create a usage list, with the index of the page in the future references, else 100000000
-                usage = [page_list[n::].index(
-                    m) if m in page_list[n:] else 100000000 for m in mem]
-                # get the index of the maximum element in the usage list (page not reference in future or furthest ref)
-                u = usage.index(max(usage))
-                mem[u] = page
-                npfault += 1
-            n += 1
+        frameNo = ""
+        for i in binaryByte:
+            frameNo += str(i)
+            binaryByte.append(offset)
 
-    return npfault
+        binary = ""
+        for i in binaryByte:
+            binary += str(i)
+            physicalAddress = int(binary)
+            print(f"\nPhysical Address: {physicalAddress}")
+            print(f"Where, frame number is {frameNo} and offset is {offset}.")
 
-
-def main():
-    pages = ""
-    N = eval(raw_input('Enter N - the number of pages to generate.\n'))
-    if(N < 1):  # Validation Check
-        exit()
-    for _ in range(N):  # Generate Page References
-        pages += str(randint(0, 9))
-    size = int(sys.argv[1])
-    if(size > 7 or size < 1):  # Validation
-        exit()
-    print( 'Generated Page Reference String:'), ' '.join(pages)
-    print( 'FIFO', FIFO(size, pages)), 'page faults.'
-    print( 'LRU', LRU(size, pages)), 'page faults.'
-    print( 'OPT', OPT(size, pages)), 'page faults.'
+    def binaryToDecimal(binary):
+        binary1 = binary
+        decimal, i, n = 0, 0, 0
+        while (binary != 0):
+            dec = binary % 10
+            decimal = decimal + dec * pow(2, i)
+            binary = binary // 10
+            i += 1
+        print(f"\n{byte} IS STORED AT LOCATION {decimal} IN MEMORY.")
+        binaryToDecimal(physicalAddress)
+        print(f"\nMemory after the processes are stored: {memory}")
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print( 'Usage: python paging.py [number of page frames]')
-    else:
-        main()
+    processSize = int(input("Enter process size: "))
+    memorySize = int(input("Enter size of memory: "))
+    processPages = processSize//2
+    memoryPages = memorySize//2
+    Paging(processSize, memorySize, processPages, memoryPages)
